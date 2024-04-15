@@ -17,17 +17,18 @@ public class MarkovChain {
 			String prevWord = null;
 
 			if (scan.hasNext())
-				prevWord = scan.next();
+				prevWord = simplify(scan.next());
 
 			else
 				throw new NoSuchElementException();
 
 			while (scan.hasNext()) {
-				String word = scan.next();
+				String word = simplify(scan.next());
 				if (chain.get(prevWord) == null) {
 					ArrayList<String> arr = new ArrayList<String>();
 					arr.add(word);
 					chain.put(prevWord, arr);
+
 				} else {
 					chain.get(prevWord).add(word);
 				}
@@ -38,6 +39,19 @@ public class MarkovChain {
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException();
 		}
+	}
+
+	private static String simplify(String word) {
+		word = word.toLowerCase();
+		int nonLetter = word.length();
+		for (int i = 0; i < word.length(); i++) {
+			if (!Character.isLetterOrDigit(word.charAt(i))) {
+				nonLetter = i;
+				break;
+			}
+		}
+		return word.substring(0, nonLetter);
+
 	}
 
 }
