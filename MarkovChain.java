@@ -2,6 +2,7 @@ package comprehensive;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.io.File;
@@ -34,24 +35,48 @@ public class MarkovChain {
 				}
 				prevWord = word;
 			}
-
+			scan.close();
 			return chain;
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException();
 		}
 	}
 
-	private static String simplify(String word) {
-		word = word.toLowerCase();
-		int nonLetter = word.length();
-		for (int i = 0; i < word.length(); i++) {
-			if (!Character.isLetterOrDigit(word.charAt(i))) {
-				nonLetter = i;
-				break;
-			}
-		}
-		return word.substring(0, nonLetter);
+	public static HashMap<String, HashMap<String, Integer>> generateHighProbText(String file, int k)
+			throws FileNotFoundException {
+		HashMap<String, HashMap<String, Integer>> chain = new HashMap<>();
+		try {
+			Scanner scan = new Scanner(new File(file));
+			String prevWord = null;
 
+			if (scan.hasNext()) {
+				prevWord = simplify(scan.next());
+			} else {
+				throw new NoSuchElementException();
+			}
+
+			while (scan.hasNext()) {
+				String word = simplify(scan.next());
+				if (!chain.containsKey(prevWord)) {
+					chain.put(prevWord, new HashMap<>());
+				}
+
+				Map<String, Integer> transitions = chain.get(prevWord);
+				transitions.put(word, transitions.getOrDefault(word, 0) + 1);
+				prevWord = word;
+			}
+
+			scan.close();
+			return chain;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private static String simplify(String word) {
+		return word.toLowerCase().split("[\\p{Punct}\\s]+")[0];
+		
 	}
 
 }
