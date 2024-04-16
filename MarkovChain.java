@@ -1,3 +1,4 @@
+
 package comprehensive;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.io.FileNotFoundException;
 
 public class MarkovChain {
 
-	public static HashMap<String, ArrayList<String>> generateText(String file, int k)
+	public static HashMap<String, ArrayList<String>> generateText(String file)
 			throws NoSuchElementException, FileNotFoundException {
 		HashMap<String, ArrayList<String>> chain = new HashMap<String, ArrayList<String>>();
 		try {
@@ -25,12 +26,12 @@ public class MarkovChain {
 
 			while (scan.hasNext()) {
 				String word = simplify(scan.next());
-				if (chain.get(prevWord) == null) {
+				if (chain.get(prevWord) == null && word != null && prevWord != null) {
 					ArrayList<String> arr = new ArrayList<String>();
 					arr.add(word);
 					chain.put(prevWord, arr);
 
-				} else {
+				} else if (word != null && prevWord != null) {
 					chain.get(prevWord).add(word);
 				}
 				prevWord = word;
@@ -42,7 +43,7 @@ public class MarkovChain {
 		}
 	}
 
-	public static HashMap<String, HashMap<String, Integer>> generateHighProbText(String file, int k)
+	public static HashMap<String, HashMap<String, Integer>> generateHighProbText(String file)
 			throws FileNotFoundException {
 		HashMap<String, HashMap<String, Integer>> chain = new HashMap<>();
 		try {
@@ -73,10 +74,13 @@ public class MarkovChain {
 			return null;
 		}
 	}
-	
+
 	private static String simplify(String word) {
-		return word.toLowerCase().split("[\\p{Punct}\\s]+")[0];
-		
+		String[] stringArr = word.toLowerCase().split("[\\p{Punct}\\s]+");
+		if (stringArr[0].equals(""))
+			return null;
+		else
+			return stringArr[0];
 	}
 
 }
