@@ -39,5 +39,15 @@ class MarkovChainTest {
 			e.printStackTrace();
 		}
 	}
+	@Test
+	void testMarkovChainHighProb() {
+		try {
+			HashMap<String, HashMap<String, Integer>> probMap = MarkovChain
+					.generateHighProbText("src/comprehensive/bingus.txt", 4);
+			assertEquals("[like, and, i, is, because, good, cheese]", probMap.keySet().toString());
+			assertEquals("[{good=1, cheese=1}, {i=1}, {like=2}, {good=1}, {cheese=1}, {and=1, things=1}, {is=1, because=1}]",
+					probMap.values().toString());
+		} catch (FileNotFoundException e) {
 
-}
+		}
+	}
