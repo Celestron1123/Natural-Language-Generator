@@ -44,14 +44,21 @@ public class MarkovChain {
 			else
 				throw new NoSuchElementException();
 
+			while (prevWord == null) {
+				prevWord = simplify(scan.next());
+			}
+
 			while (scan.hasNext()) {
 				String word = simplify(scan.next());
-				if (chain.get(prevWord) == null && word != null && prevWord != null) {
+				while (word == null) {
+					word = simplify(scan.next());
+				}
+				if (chain.get(prevWord) == null) {
 					ArrayList<String> arr = new ArrayList<String>();
 					arr.add(word);
 					chain.put(prevWord, arr);
 
-				} else if (word != null && prevWord != null) {
+				} else {
 					chain.get(prevWord).add(word);
 				}
 				prevWord = word;
@@ -60,6 +67,8 @@ public class MarkovChain {
 			return chain;
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException();
+		} catch (NoSuchElementException e) {
+			throw new NoSuchElementException();
 		}
 	}
 
@@ -87,15 +96,22 @@ public class MarkovChain {
 			else
 				throw new NoSuchElementException();
 
+			while (prevWord == null) {
+				prevWord = simplify(scan.next());
+			}
+
 			while (scan.hasNext()) {
 				String word = simplify(scan.next());
+				while (word == null) {
+					word = simplify(scan.next());
+				}
 
-				if (!chain.containsKey(prevWord) && word != null && prevWord != null) {
+				if (!chain.containsKey(prevWord)) {
 					HashMap<String, Integer> map = new HashMap<String, Integer>();
 					map.put(word, 1);
 					chain.put(prevWord, map);
 
-				} else if (word != null && prevWord != null) {
+				} else {
 					HashMap<String, Integer> bruh = chain.get(prevWord);
 					bruh.put(word, bruh.getOrDefault(word, 0) + 1);
 				}
@@ -104,10 +120,10 @@ public class MarkovChain {
 			}
 			scan.close();
 			return chain;
-		} catch (
-
-		FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException();
+		} catch (NoSuchElementException e) {
+			throw new NoSuchElementException();
 		}
 	}
 
