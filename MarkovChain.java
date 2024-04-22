@@ -126,6 +126,42 @@ public class MarkovChain {
 			throw new NoSuchElementException();
 		}
 	}
+	public static HashMap<String, HashMap<String, Integer>> generateOneTextAlternative(String file)
+			throws FileNotFoundException, NoSuchElementException, IOException {
+		HashMap<String, HashMap<String, Integer>> chain = new HashMap<>();
+		String prevWord = null;
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				String[] words = line.split("\\s+");
+				for (String rawWord : words) {
+					String word = simplify(rawWord);
+					if (word != null) {
+						if (prevWord != null) {
+							if (!chain.containsKey(prevWord)) {
+								chain.put(prevWord, new HashMap<>());
+							}
+							HashMap<String, Integer> transitions = chain.get(prevWord);
+							if (transitions.containsKey(word)) {
+								transitions.put(word, transitions.get(word) + 1);
+							} else {
+								transitions.put(word, 1);
+							}
+						}
+						prevWord = word;
+					}
+				}
+			}
+
+		} catch (FileNotFoundException e) {
+			throw new FileNotFoundException("The file was not found: " + file);
+		} catch (IOException e) {
+			throw new IOException("An error occurred while reading the file: " + file, e);
+		}
+
+		return chain;
+	}
 
 	/**
 	 * A private helper class to set a word to lowercase and deliminate based on
