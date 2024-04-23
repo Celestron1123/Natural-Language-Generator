@@ -1,6 +1,6 @@
 package comprehensive;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
 /**
@@ -9,17 +9,19 @@ import java.util.NoSuchElementException;
  * "all" is passed as a fourth argument then the resultant phrase will be based
  * on randomness and probability. If "one" is passed then only the most probable
  * words will be printed in the phrase.
+ * 
+ * @authors - Elijah Potter & William Ngo
+ * @version April 23, 2024
  */
 public class TextGenerator {
 
-	public static void main(String[] args) throws NoSuchElementException, FileNotFoundException {
+	public static void main(String[] args) throws NoSuchElementException, IOException {
 		if (args.length == 3) {
 			TextGeneratorModel.findKMostProbable(args[0], args[1], args[2]);
 		} else if (args[3].equals("all")) {
 			TextGeneratorModel.createPhrase(args[0], args[1], args[2]);
 		} else if (args[3].equals("one")) {
 			TextGeneratorModel.createOnePhrase(args[0], args[1], args[2]);
-
 		}
 
 	}

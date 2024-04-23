@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * A supplemental class for the TextGeneratorModel class designed to create a
@@ -16,7 +19,7 @@ import java.io.FileNotFoundException;
  * neglected).
  * 
  * @authors - Elijah Potter & William Ngo
- * @version April 16, 2024
+ * @version April 23, 2024
  */
 public class MarkovChain {
 
@@ -53,11 +56,12 @@ public class MarkovChain {
 				while (word == null) {
 					word = simplify(scan.next());
 				}
+				// If the ArrayList hasn't been created yet, make one
 				if (chain.get(prevWord) == null) {
 					ArrayList<String> arr = new ArrayList<String>();
 					arr.add(word);
 					chain.put(prevWord, arr);
-
+				// Otherwise, add the word to the pre-existing array
 				} else {
 					chain.get(prevWord).add(word);
 				}
@@ -82,50 +86,8 @@ public class MarkovChain {
 	 * @return A HashMap Markov Chain
 	 * @throws NoSuchElementException If the file is empty
 	 * @throws FileNotFoundException  If the file name is invalid
+	 * @throws IOException            If an error is found during file reading
 	 */
-	public static HashMap<String, HashMap<String, Integer>> generateOneText(String file)
-			throws NoSuchElementException, FileNotFoundException {
-		HashMap<String, HashMap<String, Integer>> chain = new HashMap<String, HashMap<String, Integer>>();
-		try {
-			Scanner scan = new Scanner(new File(file));
-			String prevWord = null;
-
-			if (scan.hasNext())
-				prevWord = simplify(scan.next());
-
-			else
-				throw new NoSuchElementException();
-
-			while (prevWord == null) {
-				prevWord = simplify(scan.next());
-			}
-
-			while (scan.hasNext()) {
-				String word = simplify(scan.next());
-				while (word == null) {
-					word = simplify(scan.next());
-				}
-
-				if (!chain.containsKey(prevWord)) {
-					HashMap<String, Integer> map = new HashMap<String, Integer>();
-					map.put(word, 1);
-					chain.put(prevWord, map);
-
-				} else {
-					HashMap<String, Integer> bruh = chain.get(prevWord);
-					bruh.put(word, bruh.getOrDefault(word, 0) + 1);
-				}
-
-				prevWord = word;
-			}
-			scan.close();
-			return chain;
-		} catch (FileNotFoundException e) {
-			throw new FileNotFoundException();
-		} catch (NoSuchElementException e) {
-			throw new NoSuchElementException();
-		}
-	}
 	public static HashMap<String, HashMap<String, Integer>> generateOneTextAlternative(String file)
 			throws FileNotFoundException, NoSuchElementException, IOException {
 		HashMap<String, HashMap<String, Integer>> chain = new HashMap<>();
@@ -135,14 +97,18 @@ public class MarkovChain {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				String[] words = line.split("\\s+");
+				// Go through each word in this line
 				for (String rawWord : words) {
 					String word = simplify(rawWord);
 					if (word != null) {
 						if (prevWord != null) {
+							// If the chain doesn't yet contain this word, add a new HashMap
 							if (!chain.containsKey(prevWord)) {
 								chain.put(prevWord, new HashMap<>());
 							}
 							HashMap<String, Integer> transitions = chain.get(prevWord);
+							// If the nested HashMap already contains the word, increment its count
+							// Otherwise, set its count to 1
 							if (transitions.containsKey(word)) {
 								transitions.put(word, transitions.get(word) + 1);
 							} else {

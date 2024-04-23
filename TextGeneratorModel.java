@@ -1,6 +1,7 @@
 package comprehensive;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -13,7 +14,7 @@ import java.util.Random;
  * generated an returned.
  * 
  * @authors - Elijah Potter & William Ngo
- * @version April 17, 2024
+ * @version April 23, 2024
  */
 public class TextGeneratorModel {
 
@@ -42,6 +43,7 @@ public class TextGeneratorModel {
 
 		for (int i = 0; i < k; i++) {
 			try {
+				// Pick a random index to access
 				index = rand.nextInt(chain.get(tempWord).size());
 				tempWord = chain.get(tempWord).get(index);
 				System.out.print(" " + tempWord);
@@ -52,7 +54,7 @@ public class TextGeneratorModel {
 
 		}
 
-	}
+	}	
 
 	/**
 	 * A method designed to create a phrase from a Markov Chain. The phrase is
@@ -64,14 +66,14 @@ public class TextGeneratorModel {
 	 * @param seed    - The starting word.
 	 * @param kString - However many words are desired in the final phrase
 	 * @throws NoSuchElementException If the file is empty
-	 * @throws FileNotFoundException  If the file can't be found
+	 * @throws IOException 
 	 */
 	public static void createOnePhrase(String file, String seed, String kString)
-			throws NoSuchElementException, FileNotFoundException {
+			throws NoSuchElementException, IOException {
 
 		int k = Integer.parseInt(kString);
 		k--;
-		HashMap<String, HashMap<String, Integer>> chain = MarkovChain.generateOneText(file);
+		HashMap<String, HashMap<String, Integer>> chain = MarkovChain.generateOneTextAlternative(file);
 		System.out.print(seed);
 		String tempWord = seed;
 
@@ -79,6 +81,7 @@ public class TextGeneratorModel {
 			try {
 				int maxCount = 0;
 				String maxKey = null;
+				// Iterate through each pair to find highest integer value 
 				for (Entry<String, Integer> pair : chain.get(tempWord).entrySet()) {
 					if (maxCount < pair.getValue()) {
 						maxKey = pair.getKey();
@@ -86,7 +89,6 @@ public class TextGeneratorModel {
 					} else if (maxCount == pair.getValue()) {
 						if (maxKey.compareTo(pair.getKey()) > 0)
 							maxKey = pair.getKey();
-
 					}
 				}
 
@@ -109,48 +111,37 @@ public class TextGeneratorModel {
 	 * @param seed    - The word to process
 	 * @param kString - The amount of words to be returned
 	 * @throws NoSuchElementException If the file is empty
-	 * @throws FileNotFoundException  If the file can't be found
+	 * @throws IOException
 	 */
 	public static void findKMostProbable(String file, String seed, String kString)
-			throws NoSuchElementException, FileNotFoundException {
+			throws NoSuchElementException, IOException {
 
 		int k = Integer.parseInt(kString);
-		HashMap<String, ArrayList<String>> chain = MarkovChain.generateText(file);
-		HashMap<String, Integer> tally = new HashMap<>();
-		String tempWord = seed;
+		HashMap<String, HashMap<String, Integer>> chain = MarkovChain.generateOneTextAlternative(file);
 		int check = 0;
-
-		for (int j = 0; j < chain.get(tempWord).size(); j++) {
-			String key = chain.get(tempWord).get(j);
-			if (tally.containsKey(key)) {
-				int count = tally.get(key);
-				count++;
-				tally.put(key, count);
-			} else {
-				tally.put(key, 1);
-			}
-		}
 
 		for (int i = 0; i < k; i++) {
 			int maxCount = 0;
 			String maxKey = null;
-			for (Entry<String, Integer> pair : tally.entrySet()) {
+			// Iterate through each pair to find highest integer value
+			for (Entry<String, Integer> pair : chain.get(seed).entrySet()) {
 				if (maxCount < pair.getValue()) {
 					maxKey = pair.getKey();
 					maxCount = pair.getValue();
 				} else if (maxCount == pair.getValue()) {
 					if (maxKey.compareTo(pair.getKey()) > 0)
 						maxKey = pair.getKey();
-
 				}
 			}
 
-			tally.remove(maxKey);
+			chain.get(seed).remove(maxKey);
+			// This is to check whether or not this is the first pass
 			if (check == 0)
 				System.out.print(maxKey);
 			else
 				System.out.print(" " + maxKey);
-			if (tally.isEmpty())
+			// Stop, if the chain is empty
+			if (chain.get(seed).isEmpty())
 				break;
 			check++;
 		}
